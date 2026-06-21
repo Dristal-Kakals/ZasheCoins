@@ -27,6 +27,11 @@ go.work.sum
 # env file
 .env
 
+# Runtime artifacts
+*.log
+/zashecoins_save.json
+
 # Editor/IDE
 # .idea/
 # .vscode/
+.claude/
