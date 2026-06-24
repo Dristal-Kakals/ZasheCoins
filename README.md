@@ -41,3 +41,6 @@ go build -o zashecoins.exe ./src
 | `src/scene_roulette.go` | рулетка |
 | `src/scene_slots.go` | слоты (барабаны + векторные символы) |
 | `src/scene_cases.go` | кейсы |
+
+
+License - MIT
