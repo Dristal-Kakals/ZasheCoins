@@ -86,6 +86,8 @@ type slotsScene struct {
 	t       float64
 	payout  int
 	lastBet int
+
+	cheat bool // зажат пробел во время прокрутки — гарантированный выигрыш
 }
 
 func newSlotsScene() *slotsScene {
@@ -136,6 +138,10 @@ func (s *slotsScene) Update(g *Game) error {
 	}
 
 	if s.phase == sSpinning {
+		// Чит: пока крутятся барабаны и зажат пробел — даём плюс.
+		if ebiten.IsKeyPressed(ebiten.KeySpace) {
+			s.cheat = true
+		}
 		s.t += 1.0 / 60.0
 		maxDur := 0.0
 		for r := 0; r < 3; r++ {
@@ -160,12 +166,22 @@ func (s *slotsScene) spin(g *Game) {
 	g.state.Balance -= s.lastBet
 	g.state.TotalSpins++
 	s.setupBoard(true)
+	s.cheat = false
 	s.t = 0
 	s.phase = sSpinning
 }
 
 func (s *slotsScene) finish(g *Game) {
 	s.phase = sDone
+	if s.cheat {
+		// Выстраиваем три одинаковых символа на линии выплаты,
+		// синхронно правя видимую ленту, чтобы барабаны показали тройку.
+		win := s.result[0]
+		for r := 0; r < 3; r++ {
+			s.result[r] = win
+			s.strips[r][s.winRow[r]] = win
+		}
+	}
 	mult := evalLine(s.result)
 	s.payout = s.lastBet * mult
 	if s.payout > 0 {
